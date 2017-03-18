@@ -1,3 +1,11 @@
+# Added by Hao
+data/
+temp/
+*.pyc
+*.zip
+*.pkl
+*.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
