@@ -63,10 +63,10 @@ def get_value_counts(df, feature_list):
         print df[feature].value_counts(dropna = False)
     return
 
-def to_datetime(df, date_cols):
-    '''parse list of coloumns to datetime timestampe'''
-    for col in date_cols:
-        df[col] = pd.to_datetime(df[col])
+def parsedate(df, columns, time_format):
+    '''parse list of coloumns to pd.datetime object'''
+    for column in columns:
+        df[column] = pd.to_datetime(df[column], format = time_format)
     return df
 
 def days_to_minutes(td):
