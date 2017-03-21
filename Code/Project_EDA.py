@@ -5,17 +5,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
 
-def explore(file):
-    def explore_file(file):
-    df = pd.read_csv(file)
-    #df = pd.read_csv(file, parse_dates= ['Opened','Closed','Updated'], infer_datetime_format=True)
-    #df = pd.read_csv(file, skiprows=1,sep = ' ', error_bad_lines=False,skiprows=1, parse_dates= ['issue_d','last_pymnt_d', 'last_credit_pull_d'], infer_datetime_format=True)
-    explore_df(df)
+def general_explore_file(filepath, show = False):
+    df = pd.read_csv(filepath)
+    if show:
+        explore_df(df)
     return df
 
-def read_csv_chunks_into_df(file_path, chunk_size, parse_date=False, date_col =None):
+def get_prep_data(filepath, parse_dt = ['Opened', 'Closed'], fix_index = 'CaseID'):
+    df = pd.read_csv(filepath, parse_dates =parse_dt, infer_datetime_format=True)
+    if fix_index:
+        df.set_index(fix_index, inplace = True)
+    return df
+
+def read_csv_chunks_into_df(file_path, chunk_size, parse_date=False):
     if parse_date:
-        chunks = pd.read_csv(file_path, parse_dates= date_col, infer_datetime_format=True, chunksize = chunk_size )
+        chunks = pd.read_csv(file_path, parse_dates= ['Opened','Closed','Updated'], infer_datetime_format=True, chunksize = chunk_size )
     else:
         chunks = pd.read_csv(file_path, chunksize = chunk_size )
     df = pd.concat(chunks)
@@ -37,6 +41,22 @@ def explore_df(df):
     print df.describe()
     return
 
+def import_data(folder, filename):
+    '''import the data and set the right datetime '''
+    folder = folder
+    filename_original = filename
+    filepath = folder + filename_original
+    df = general_explore_file(filepath)
+
+    df = df.sort_values('CaseID')
+    df.set_index('CaseID', inplace = True)
+
+    ''' parse dates'''
+    dt_list = ['Opened','Closed','Updated'] # list of datetime columns
+    time_format = '%m/%d/%Y %I:%M:%S %p'
+    dft = parsedate(df, dt_list, time_format) # parse ['Opened','Closed','Updated'] to timedate
+    return dft
+
 def get_unique(df):
     features = df.columns.values
     print '********* Number of unique values **********'
@@ -51,7 +71,6 @@ def get_missing(df):
     for feature in features:
         temp = df[df2[feature]]
         print feature,' ', len(temp)
-    print 'Total missing data ', df2.isnull().sum().sum()
 
 def drop_na_row(df,feature):
     df = df.ix[df[feature].notnull(), :]
@@ -64,16 +83,15 @@ def get_value_counts(df, feature_list):
     return
 
 def parsedate(df, columns, time_format):
-    '''parse list of coloumns to pd.datetime object'''
     for column in columns:
         df[column] = pd.to_datetime(df[column], format = time_format)
     return df
 
-def days_to_minutes(td):
-    return  td.total_seconds()//60#(td.seconds//60)%60
+def days_to_minutes(dt):
+    return  dt.total_seconds()//60#(td.seconds//60)%60
 
-def days_to_hours(td):
-    hours = td.total_seconds()/3600#(td.seconds//60)%60
+def days_to_hours(dt):
+    hours = dt.total_seconds()/3600#(td.seconds//60)%60
     return np.round(hours,1)
 
 def get_sorted_category_value(df, category):
@@ -83,12 +101,34 @@ def get_sorted_category_value(df, category):
     return dfm.index
 
 def category_to_numer_dict(df, category, values):
-    '''Change a categorical column to numeric and save the categorical values in a dictionary for later reference'''
+    '''
+    Change a categorical column to numeric and save the categorical values in a dictionary for later reference
+    values is sorted list of categorical values
+    '''
     dict = defaultdict(str)
     for i,value in enumerate(values):
         dict[i] = value # store the categorical values in a dictionary for later reference
         df.ix[df[category]==value, category] = i
     return dict
+
+def category_to_numer_basic(df, category):
+    '''Change a categorical column to numeric and save the categorical values in a dictionary for later reference (basic version)'''
+    values = df[category].unique()
+    for i,value in enumerator(values):
+        df.ix[df[category]==value, category] = i
+    return df
+
+def batch_process_categories(df, categories):
+    '''convert categorical features to numerical by batch,
+    return a dictionary of dictionaries storing the mapping of categorical value to number'''
+    cate_dict = {}
+    for category in categories:
+        '''Convert the categoricl column  to numerical'''
+        if  category in df.columns.values:
+            cate_val = get_sorted_category_value(df,category)
+            '''The category_to_numer_dict() modify the input dataframe by side-effect and return a dictionary'''
+            cate_dict[category] = category_to_numer_dict(df, category, cate_val)
+    return cate_dict
 
 if __name__ == '__main__':
     file1 = '/Users/haowei/Documents/GN/Project/data_pool/Loan_data/LoanStats_2016Q1.csv'
