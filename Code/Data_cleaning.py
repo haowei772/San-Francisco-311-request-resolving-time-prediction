@@ -24,7 +24,7 @@ def check_word_in_col(df, column, word):
     df_found = df[cond]
     df_not_found = df[~cond]
     return df_found, df_not_found
-    
+
 def clean_data(dft):
     '''remove and save the cases that are not closed'''
     dft_still_open = dft[dft['Closed'].isnull()] # cases that not closed
