@@ -3,6 +3,11 @@ import numpy as np
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from pandas.tseries.holiday import USFederalHolidayCalendar as calendar
+from datetime import date, datetime, time, timedelta
+from scipy import stats
+
 sns.set()
 
 def general_explore_file(filepath, show = False):
@@ -102,20 +107,23 @@ def get_sorted_category_value(df, category):
 
 def category_to_numer_dict(df, category, values):
     '''
-    Change a categorical column to numeric and save the categorical values in a dictionary for later reference
-    values is sorted list of categorical values
+    Change a categorical column to numeric and save the categorical values in a
+    dictionary for later reference values is sorted list of categorical values
     '''
     dict = defaultdict(str)
     for i,value in enumerate(values):
-        dict[i] = value # store the categorical values in a dictionary for later reference
+        dict[i] = value # store the categorical values in a dictionary for reference
         df.ix[df[category]==value, category] = i
+    df[category].astype(int, inplace=True)
     return dict
 
 def category_to_numer_basic(df, category):
-    '''Change a categorical column to numeric and save the categorical values in a dictionary for later reference (basic version)'''
+    '''Change a categorical column to numeric and save the categorical
+    values in a dictionary for later reference (basic version)'''
     values = df[category].unique()
     for i,value in enumerator(values):
         df.ix[df[category]==value, category] = i
+    df[category].astype(int, inplace=True)
     return df
 
 def batch_process_categories(df, categories):
@@ -123,12 +131,72 @@ def batch_process_categories(df, categories):
     return a dictionary of dictionaries storing the mapping of categorical value to number'''
     cate_dict = {}
     for category in categories:
-        '''Convert the categoricl column  to numerical'''
+        '''Convert the categoricl column to numerical'''
         if  category in df.columns.values:
             cate_val = get_sorted_category_value(df,category)
             '''The category_to_numer_dict() modify the input dataframe by side-effect and return a dictionary'''
             cate_dict[category] = category_to_numer_dict(df, category, cate_val)
     return cate_dict
+
+def check_group_mean(df, groupby_cols, target_cols):
+    for col in groupby_cols:
+        dfm = df.groupby(col).mean()
+        print dfm[target_cols]
+    return
+
+def check_group_stats(df, groupby_cols, target_cols):
+    for col in groupby_cols:
+        dfm = df.groupby(col).describe()
+        print dfm[target_cols]
+    return
+
+def plot_data_on_date(df, data_col, year = False, month = False, day = False, dot = True):
+    ''' set index to date and plot df column data against the index, year can be Boolean or int'''
+    dfcp = df.copy()
+    dfcp.set_index('Opened', inplace = True)
+    if (type(year)==int) & (type(month)==int) & (type(day)==int):
+        cond1 = dfcp.index.year == year
+        cond2 = dfcp.index.month == month
+        cond3 = dfcp.index.day == day
+        dfcp1 = dfcp[cond1 & cond2 & cond3]
+    elif (type(year)==int) & (type(month)==int):
+        cond1 = dfcp.index.year == year
+        cond2 = dfcp.index.month == month
+        dfcp1 = dfcp[cond1 & cond2]
+    elif type(year)==int:
+        dfcp1 = dfcp[dfcp.index.year == year]
+    else:
+        dfcp1 = dfcp
+    if dot:
+        dfcp1[data_col].plot(figsize=(18,16), c='m', alpha = 0.2,style='o')
+    else:
+        dfcp1[data_col].plot(figsize=(18,16), c='k', alpha = 0.2)
+    plt.show()
+    return
+
+'''The following function is not necessary, becasue plot_data_on_date() can do scatter plot'''
+'''plot a scatter plot on data'''
+def scatter_data_on_date(df, data_col, year = False, month = False, day = False):
+    ''' set index to date and plot df column data against the index; year, month, and day can be Boolean or int'''
+    dfcp = df.copy()
+    dfcp['Opened_Int'] = dfcp['Opened'].astype(np.int64)
+    dfcp.set_index('Opened', inplace = True)
+    if (type(year)==int) & (type(month)==int) & (type(day)==int):
+        cond1 = dfcp.index.year == year
+        cond2 = dfcp.index.month == month
+        cond3 = dfcp.index.day == day
+        dfcp1 = dfcp[cond1 & cond2 & cond3]
+    elif (type(year)==int) & (type(month)==int):
+        cond1 = dfcp.index.year == year
+        cond2 = dfcp.index.month == month
+        dfcp1 = dfcp[cond1 & cond2]
+    elif type(year)==int:
+        dfcp1 = dfcp[dfcp.index.year == year]
+    else:
+        dfcp1 = dfcp
+    dfcp1.plot(kind = 'scatter', x='Opened_Int', y='Process_days', alpha = 0.2, c = 'm', figsize=(20,10))
+    return
+
 
 if __name__ == '__main__':
     file1 = '/Users/haowei/Documents/GN/Project/data_pool/Loan_data/LoanStats_2016Q1.csv'
