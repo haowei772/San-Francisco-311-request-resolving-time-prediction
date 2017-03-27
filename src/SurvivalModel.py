@@ -12,7 +12,7 @@ from lifelines.datasets import load_regression_dataset
 from lifelines.utils import k_fold_cross_validation
 
 
-def aalen_aditive_model(df, target_col = 'Process_days', event = 'Event', coeff_pen = 0.5, smooth_pen = 0.1):
+def aalen_additive_model(df, target_col = 'Process_days', event = 'Event', coeff_pen = 0.5, smooth_pen = 0.1):
     '''creat an Aalen Additive Fitter instance that fits the regression model:
     with hazard(t)  = b_0(t) + b_1(t)*x_1 + ... + b_N(t)*x_N
     i.e., the hazard rate is a linear function of the covariates.

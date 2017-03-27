@@ -19,8 +19,8 @@ import pickle
 import os
 
 '''$$$$$$$$$$$$$$$$$$$$ Start Pre-modeling Process $$$$$$$$$$$$$$$$$$$$'''
-def train_test_df_split(df, test_size = 0.2, ramdom_seed = 111):
-    np.random.seed(seed = ramdom_seed)
+def train_test_df_split(df, test_size = 0.2, random_seed = 111):
+    np.random.seed(seed = random_seed)
     df['Flag'] = np.random.random(size = len(df)) <= test_size
     df_train = df[~df['Flag']]
     df_test = df[df['Flag']]
@@ -103,9 +103,21 @@ def get_df_for_modeling(df_pickle_filename, dict_pickle_filename, filename_train
         dump_object_to_pickle(category_dictionaries, dict_pickle_filename)
     return df,category_dictionaries
 
+def get_df_for_engineer(filename_pickle, filename_train):
+    if os.path.exists(filename_pickle):
+        print 'get df from pickle'
+        df = load_object_from_pickle(filename_pickle)
+    else:
+        '''Read data from train csv file'''
+        print 'get data from csv file'
+        df = EDA.get_prep_data(filename_train)
+        '''save df to pickle files'''
+        dump_object_to_pickle(df,filename_pickle)
+    return df
+
 def process_data_for_survival_model(df, test_size = 0.2, random_state = 222):
     df['Event'] = 1
     df = df.astype(float)
-    df_train, df_test = train_test_df_split(df, test_size = test_size, ramdom_seed = random_state)
+    df_train, df_test = train_test_df_split(df, test_size = test_size, random_seed = random_state)
     return df_train, df_test
 '''$$$$$$$$$$$$$$$$$$$$ End Pre-modeling Process $$$$$$$$$$$$$$$$$$$$'''

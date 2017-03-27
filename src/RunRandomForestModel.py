@@ -13,7 +13,7 @@ if __name__ == '__main__':
     '''Check if there is pickle files of dataframe and category dictionaries ready for load'''
     df_pickle_filename = '../data/df_tr.pickle'
     dict_pickle_filename = '../data/category_dict.pickle'
-    rfr_model_pickle_filename = '../results/rfr_model.pickle'
+    rfr_model_pickle_filename = '../data/rfr_model.pickle'
     filename_train = '../data/SF311_train.csv'
 
     df_tr, category_dictionaries = get_df_for_modeling(df_pickle_filename, dict_pickle_filename, filename_train)
