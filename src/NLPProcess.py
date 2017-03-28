@@ -1,73 +1,70 @@
-'''Deal with request type using tf-idf then clustering'''
+import numpy as np
+import pandas as pd
+from scipy import sparse
+from sklearn.metrics.pairwise import cosine_similarity
+
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem.porter import PorterStemmer
-from nltk.stem.snowball import SnowballStemmer
-from nltk.stem.wordnet import WordNetLemmatizer
+
 from nltk import pos_tag
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import  TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from PremodelingProcess import train_vali_split, get_df_for_modeling, \
-dump_object_to_pickle, get_df_for_engineer, \
-train_test_df_split, process_data_for_survival_model
+from PremodelingProcess import train_vali_split, get_df_for_modeling, dump_object_to_pickle, get_df_for_engineer, process_data_for_survival_model
+from sklearn.cluster import KMeans
 
 
-'''Check if there is pickle files of dataframe ready for load'''
-filename_train_pickle = '../data/SF311_train.pickle'
-filename_train = '../data/SF311_train.csv'
-df = get_df_for_engineer(filename_train_pickle, filename_train)
-print 'dataframe shape: ', df.shape
-#print df.head()
+class NLPProcessor(object):
 
-rt = df['Request Type'].apply(lambda x: str(x).lower())
-documents = list(rt)[:1000]
-print documents[:10]
-'''$$$$$$$$$$'''
+    def __init__(self, cluster_size):
+        self.cluster_size = cluster_size
+        self.tfidf = None
 
-df = df[:1000]#run a pilot
-df_train, df_test = train_test_df_split(df, test_size = 0.2, random_seed = 111)
-rt = df_train['Request Type'].apply(lambda x: str(x).lower())
-documents = list(rt)
-print documents[:10]
-# Tokenize and remove stop words
+    def process_docs(df, target_col):
+        series_train = df[target_col].apply(lambda x: str(x).lower())
+        content = list(series_train)
 
-# 1. Create a set of documents.
-#documents = [' '.join(article['content']).lower() for article in coll.find()]
+        # Create a set of tokenized documents.
+        docs = [word_tokenize(content) for content in documents]
 
-# 2. Create a set of tokenized documents. No need to tokenize because there is no punctuation in the phrase
-# docs = [word_tokenize(content) for content in documents]
-# print docs[:15]
+        #Stemming / Lemmatization
+        porter = PorterStemmer()
+        docs_porter = [[porter.stem(word) for word in words] for words in docs]
+        new_docs = [' '.join(doc) for doc in docs_porter]
+        return new_docs
 
-# # 3. Strip out stop words from each tokenized document.
-# stop = set(stopwords.words('english'))
-# docs = [[word for word in words if word not in stop] for words in docs]
+    def fit_transform(self, df, target_col):
+        docs = process_docs(df, target_col)
+        '''Make tfidf model and tfidfed matrix'''
+        self.tfidf = TfidfVectorizer(stop_words='english')
+        self.tfidfed_train = tfidf.fit_transform(docs)
 
-# Stemming / Lemmatization
+        '''save ftidf model to pickle file, will be used to transform the text in test file'''
+        filename_tfidf_pickle = '../data/SF311_tfidf.pickle'
+        filename_tfidfed_pickle = '../data/SF311_tfidfed.pickle'
+        dump_object_to_pickle(self.tfidf,filename_tfidf_pickle)
+        dump_object_to_pickle(self.tfidfed_train,filename_tfidfed_pickle)
+        return self.tfidf
 
-# 1. Stem using both stemmers and the lemmatizer
-# porter = PorterStemmer()
+    def get_kmeans_train_labels_(self):
+        print 'Perform kmeans...'
+        self.k_means = KMeans(n_clusters=slef.cluster_size, n_jobs=-2)
+        if self.tfidfed_train:
+            self.k_means.fit(self.tfidfed_train)
+        else:
+            print 'No valid tf-idf, need to fit_transform the training data!'
+            return
+        # print len(k_means.labels_)
+        #print k_means.cluster_centers_[:5]
+        self.cluster_centers_ = self.k_means.cluster_centers_
+        self.train_labels_ =  self.k_means.labels_
+        return self.train_labels_
 
-# snowball = SnowballStemmer('english')
-# wordnet = WordNetLemmatizer()
-# docs_porter = [[porter.stem(word) for word in words] for words in documents]
+    def transform(self, df, target_col):
+        docs = process_docs(df, target_col)
+        self.tfidfed_test = self.tfidf.transform(docs)
+        self.tfidfed_test_dense = self.tfidfed_test.todense()
+        self.cosine_similarities = linear_kernel(self.tfidfed_test_dense, self.cluster_centers_)
 
-# docs_snowball = [[snowball.stem(word) for word in words] for words in docs]
-# docs_wordnet = [[wordnet.lemmatize(word) for word in words] for words in docs]
-
-#print docs_porter[:30]
-
-# 3. Create word count vector over the whole corpus.
-# cv = CountVectorizer(stop_words='english')
-# vectorized = cv.fit_transform(documents)
-
-tfidf = TfidfVectorizer(stop_words='english')
-tfidfed = tfidf.fit_transform(documents)
-
-print tfidfed
-'''save ftidf model to pickle file, will be used to transform the text in test file'''
-filename_tfidf_pickle = '../data/SF311_tfidf.pickle'
-filename_tfidfed_pickle = '../data/SF311_tfidfed.pickle'
-dump_object_to_pickle(tfidf,filename_tfidf_pickle)
-dump_object_to_pickle(tfidfed,filename_tfidfed_pickle)
-
-# Cosine Similarity using TF-IDF
+        self.test_labels_ = np.argmax(self.cosine_similarities, axis =1)
+        return self.test_labels_
