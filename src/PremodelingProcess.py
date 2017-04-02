@@ -19,6 +19,15 @@ import pickle
 import os
 
 '''$$$$$$$$$$$$$$$$$$$$ Start Pre-modeling Process $$$$$$$$$$$$$$$$$$$$'''
+def add_dummy(df, target_col):
+    d = pd.get_dummies(df[target_col])
+    d = d.drop(d.columns[-1], axis = 1)
+    df_list = [df,d]
+    df = pd.concat(df_list,axis =1)
+    df = df.drop(target_col, axis =1)
+    return df
+
+
 def train_test_df_split(df, test_size = 0.2, random_seed = 111):
     np.random.seed(seed = random_seed)
     df['Flag'] = np.random.random(size = len(df)) <= test_size
@@ -31,7 +40,7 @@ def train_test_df_split(df, test_size = 0.2, random_seed = 111):
 '''use the training dataset and do another training validation split'''
 
 '''Setup data with simple train/test split'''
-def train_vali_split(df, target_col, test_size = 0.3, random_seed = 100):
+def train_vali_split(df, target_col, test_size = 0.2, random_seed = 100):
     v_features = df.columns.tolist()
     v_features = v_features[:]
     del v_features[v_features.index(target_col)]
@@ -42,18 +51,40 @@ def train_vali_split(df, target_col, test_size = 0.3, random_seed = 100):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_seed)
     return X_train, X_test, y_train, y_test
 
+def get_X_y(df, target_col):
+    v_features = df.columns.tolist()
+    v_features = v_features[:]
+    del v_features[v_features.index(target_col)]
+
+    X = df.ix[:, v_features]
+    y = df[target_col].astype('float')
+    return X, y
+
 def preprocess_data(df):
 
     '''Select features'''
-    use_features = ['Responsible Agency', 'Category', 'Request Type',\
+    # print df.columns.values
+    use_features = ['Responsible Agency', 'Category','Request Topic',\
                 'Supervisor District', 'Neighborhood', 'Source', 'Process_days', \
-                'Day_Of_Week', 'Month', 'Year', 'Weekend', 'Holiday', 'Before_Holiday', 'Opened_Int']
+                'Day_Of_Week', 'Month', 'Year', 'Weekend', 'Holiday', 'Before_Holiday', 'Open Time' ]
+    # '''temporay use'''
+    # use_features = ['Responsible Agency', 'Category','Request Topic',\
+    #             'Supervisor District', 'Neighborhood', 'Source', 'Process_days', \
+    #             'Day_Of_Week', 'Month', 'Year', 'Weekend', 'Holiday', 'Before_Holiday', 'Opened_Int' ]
+    # # '''test the  features '''
+    # # use_features = ['Responsible Agency', 'Category','Request Topic',\
+    #             'Supervisor District', 'Neighborhood', 'Source', 'Process_days', \
+    #             'Day_Of_Week', 'Month', 'Year', 'Weekend', 'Holiday' ]
+
     df = df[use_features]
     '''scale feature Opened_Int, will not need this line after correct the early point'''
-    df['Opened_Int'] = df['Opened_Int']*1./10**16
-
+    # df['Opened_Int'] = df['Opened_Int']*1./10**16
+    #print df['Open_Time'].dtype
     '''convert categorical features to numerical'''
-    cate_list = ['Category','Responsible Agency','Request Type','Neighborhood','Source']
+    cate_list = ['Category','Responsible Agency','Request Topic','Neighborhood','Supervisor District','Source']
+    # cate_list = ['Category','Responsible Agency','Neighborhood','Source'] #  for NLP
+
+    #print 'no open-time and topic'
     cate_dict = EDA.batch_process_categories(df, cate_list)
     return df, cate_dict
 
@@ -97,7 +128,7 @@ def get_df_for_modeling(df_pickle_filename, dict_pickle_filename, filename_train
         print 'get data from csv file'
         df = EDA.get_prep_data(filename_train)
         df, category_dictionaries = preprocess_data(df)
-
+        # '''EBS out of space'''
         '''save df and category_dictionaries to pickle files'''
         dump_object_to_pickle(df,df_pickle_filename)
         dump_object_to_pickle(category_dictionaries, dict_pickle_filename)

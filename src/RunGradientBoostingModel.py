@@ -15,10 +15,10 @@ if __name__ == '__main__':
     filename_train = '../data/SF311_train.csv'
     df_tr, category_dictionaries = get_df_for_modeling(df_pickle_filename, dict_pickle_filename, filename_train)
 
-    X_train, X_test, y_train, y_test = train_vali_split(df_tr, 'Process_days', test_size = 0.2, random_seed = 100)
+    X_train, X_test, y_train, y_test = train_vali_split(df_tr, 'Process_days', test_size = 0.15, random_seed = 100)
     print 'X_train: ', len(X_train)
     print 'X_test: ', len(X_test)
-    gbr_model, yhat_Gboosting, Gboosting_rscore = GradientBoostingRegressor_model(X_train, X_test, y_train, y_test, estimators=400, learning_r = 0.05)
+    gbr_model, yhat_Gboosting, Gboosting_rscore = GradientBoostingRegressor_model(X_train, X_test, y_train, y_test, estimators=600, learning_r = 0.1)
     mse_Gboosting = mean_squared_error(y_test, yhat_Gboosting)
 
     print 'Gboosting_rscore: ',Gboosting_rscore
@@ -28,5 +28,5 @@ if __name__ == '__main__':
     cross_val_scores = cross_val_score(gbr_model, X_train, y_train, cv=3)
     print 'cross_val_scores: ', cross_val_scores
 
-    '''save the model to a pickle file'''
-    dump_object_to_pickle(gbr_model, gbr_model_pickle_filename)
+    # '''save the model to a pickle file'''
+    # dump_object_to_pickle(gbr_model, gbr_model_pickle_filename)

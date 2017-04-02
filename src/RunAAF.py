@@ -15,7 +15,7 @@ if __name__ == '__main__':
     df, category_dictionaries = get_df_for_modeling(df_pickle_filename, dict_pickle_filename, filename_train)
 
     '''simplify the the model'''
-    kept_list = ['Responsible Agency', 'Request Type', 'Neighborhood', 'Process_days',  'Opened_Int']
+    kept_list = ['Responsible Agency', 'Category','Request Topic', 'Neighborhood','Supervisor District', 'Process_days', 'Weekend', 'Holiday', 'Open_Time']
     df = df[kept_list]
     # limit = int(0.8*len(df))
     # '''only try the most recent 1/4 of data'''

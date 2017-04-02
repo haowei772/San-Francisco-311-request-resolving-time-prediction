@@ -75,11 +75,14 @@ def get_unique(df):
 
 def get_missing(df):
     print '********* Number of missing values **********'
-    df2 = df.isnull()
-    features = df.columns.values
-    for feature in features:
-        temp = df[df2[feature]]
-        print feature,' ', len(temp)
+    #     df2 = df.isnull()
+    #     features = df.columns.values
+    #     for feature in features:
+    #         temp = df[df2[feature]]
+    #         print feature,' ', len(temp)
+    print df.isnull().sum()
+    print 'Total missing: ', df.isnull().sum().sum()
+
 
 def drop_na_row(df,feature):
     df = df.ix[df[feature].notnull(), :]
@@ -155,6 +158,15 @@ def check_group_stats(df, groupby_cols, target_cols):
         print dfm[target_cols]
     return
 
+def get_description_by_column(df, target_col, by_col):
+    categories = get_sorted_category_value(df,by_col)
+    for i,category in enumerate(categories):
+        print category
+        df1 =df[df[by_col] == category]
+        df1 = df1[target_col]
+        print '***',i,'***'
+        print df1.describe()
+    return
 # def plot_data_on_date(df, data_col, year = False, month = False, day = False, dot = True):
 #     ''' set index to date and plot df column data against the index, year can be Boolean or int'''
 #     dfcp = df.copy()

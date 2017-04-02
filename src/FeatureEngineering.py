@@ -24,6 +24,11 @@ def add_features(df):
                              .isin(holidays)).astype(int)
     num_of_holiday = len(df1[df1['Holiday'] == 1])
     num_of_before_holiday = len(df1[df1['Before_Holiday'] == 1])
+
+    df1['Open_Time'] = df1['Opened'].astype(int).astype(float)/(10**16)
+    df1['Request Topic'] = df1['Request Type']
+    '''add_current_open will get the number of current open taskes, but it takes to long!'''
+    #df1 = add_current_open(df1)
     return df1
 
 def get_oneway_anova(df, target_col, group_col, group_list=False):
