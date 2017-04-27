@@ -81,8 +81,8 @@ def preprocess_data(df):
     # df['Opened_Int'] = df['Opened_Int']*1./10**16
     #print df['Open_Time'].dtype
     '''convert categorical features to numerical'''
-    cate_list = ['Category','Responsible Agency','Request Topic','Neighborhood','Supervisor District','Source']
-    # cate_list = ['Category','Responsible Agency','Neighborhood','Source'] #  for NLP
+    #cate_list = ['Category','Responsible Agency','Request Topic','Neighborhood','Supervisor District','Source']
+    cate_list = ['Category','Responsible Agency','Neighborhood','Source'] #  for NLP
 
     #print 'no open-time and topic'
     cate_dict = EDA.batch_process_categories(df, cate_list)
@@ -133,6 +133,22 @@ def get_df_for_modeling(df_pickle_filename, dict_pickle_filename, filename_train
         dump_object_to_pickle(df,df_pickle_filename)
         dump_object_to_pickle(category_dictionaries, dict_pickle_filename)
     return df,category_dictionaries
+
+def get_df_for_modeling_topic(filename_train):
+    '''Read data from train csv file'''
+    print 'get data from csv file'
+    df = EDA.get_prep_data(filename_train)
+    use_features = ['Responsible Agency', 'Category','Request Details',\
+                'Supervisor District', 'Neighborhood', 'Source', 'Process_days', \
+                'Day_Of_Week', 'Month', 'Year', 'Weekend', 'Holiday', 'Before_Holiday', 'Open Time' ]
+
+    df = df[use_features]
+    '''convert categorical features to numerical'''
+    cate_list = ['Category','Responsible Agency','Request Topic','Neighborhood','Source']
+    # cate_list = ['Category','Responsible Agency','Neighborhood','Source'] #  for NLP
+    cate_dict = EDA.batch_process_categories(df, cate_list)
+    return df, cate_dict
+
 
 def get_df_for_engineer(filename_pickle, filename_train):
     if os.path.exists(filename_pickle):
