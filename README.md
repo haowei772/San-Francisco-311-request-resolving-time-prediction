@@ -6,20 +6,21 @@ Aim of the project:
 
 Development of a predictive model to determine the time of resolving a 311-call request based on various features, such as the description, location, submission time, and corresponding agency of the request.
 
-Data source:
+Data source:\n
+  Data is obtained from San Francisco public dataset.\n
+  Exemplary features include\n
+    Responsible Agency: 409\n
+     Category: 28 \n
+    Neighborhood: 126\n
 
-Data is obtained from San Francisco public dataset and the data is heterogenous.
-Responsible Agency: 409
- Category: 28 
-Neighborhood: 126
-
-Overall mean time of resolving requests is 33.3 days with standard deviation of 128 days
-Min: less than 10 minutes (e.g., Noise Report)
-Max: over 5 years (e.g., Fix a collapsed_sidewalk)
+Data is heterogenous.
+  Overall mean time of resolving requests is 33.3 days with standard deviation of 128 days
+  Minimum time of resolving a request is less than 10 minutes (e.g., Noise Complain)
+  Maximum time of resolving a request is over 5 years (e.g., Fix a collapsed_sidewalk)
 
 Brief description of data analysis pipeline:
 
-  1. Data cleaning
+  1. Data cleaning\n
      1.1 Remove invalid and duplicated cases
      1.2 Deal with missing data
           a) Fill missing categorical entries with new value - 'Missing value'
