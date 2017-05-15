@@ -18,6 +18,8 @@ Development of a predictive model to determine the time of resolving a 311-call 
   Minimum resolving-time is less than 10 minutes (e.g., Noise Complain).  
   Maximum resolving-time is over 5 years (e.g., Fix a collapsed_sidewalk)
 
+  ![alt text](https://github.com/haowei772/Capstone-project/blob/master/figures/Heterogenous_data.png)
+
 ### Data analysis pipeline:  
   1. Data cleaning  
      1.1 Remove invalid and duplicated cases  
@@ -47,7 +49,11 @@ Development of a predictive model to determine the time of resolving a 311-call 
 Exemples of important features:  
 'Request topic', 'Response Agency', 'Neighborhood', 'Year'...
 
+![alt text](https://github.com/haowei772/Capstone-project/blob/master/figures/Feature_importance.png)
+
 Analysis of 'Year' feature leads to the discover of a interesting pattern that the mean resolving-time of 311-requests started to decrease after 2010, coinciding with the incorporation of data-driven techniques into San Francisco 311 program.
+
+![alt text](https://github.com/haowei772/Capstone-project/blob/master/figures/Mean_resolving_time.png)
 
 ### Summary  
 Random forest model performs well when modeling heterogenous data compared to other linear models.
