@@ -1,12 +1,12 @@
-###High level description of project:
+### High level description of project:
 
 San Francisco 311-call request resolving time prediction.
 
-###Aim of the project:
+### Aim of the project:
 
 Development of a predictive model to determine the time of resolving a 311-call request based on various features, such as the description, location, submission time, and corresponding agency of the request.
 
-###Data source:  
+### Data source:  
   Data is obtained from San Francisco public dataset.  
   Exemplary features include  
   Responsible Agency: 409
@@ -18,7 +18,7 @@ Development of a predictive model to determine the time of resolving a 311-call 
   Minimum time of resolving a request is less than 10 minutes (e.g., Noise Complain).  
   Maximum time of resolving a request is over 5 years (e.g., Fix a collapsed_sidewalk)
 
-###Data analysis pipeline:  
+### Data analysis pipeline:  
   1. Data cleaning  
      1.1 Remove invalid and duplicated cases  
      1.2 Deal with missing data  
@@ -35,7 +35,7 @@ Development of a predictive model to determine the time of resolving a 311-call 
      3.3 Development of random forest regression model  
      3.4 Development of gradient boosting regression model  
 
-###Model evaluation:
+### Model evaluation:
 
 | Models                             | R-squared     |
 | ---------------------------------- |:-------------:|
@@ -54,7 +54,7 @@ Feature importance:
 
 Analysis of 'Year' feature leads to the discover of a interesting pattern that the mean resolving time of 311 requests started to decrease after 2010, coinciding with the starting time of data driven techniques' incorporation into San Francisco 311 program management.
 
-###Summary  
+### Summary  
 Random forest model performs well when modeling heterogenous data.
 
 Data driven techniques may contribute to the increase of work efficiency of San Francisco 311 program.
