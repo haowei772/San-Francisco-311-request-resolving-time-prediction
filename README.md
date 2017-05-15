@@ -1,6 +1,6 @@
 ### High level description of project:
 
-San Francisco 311-call request resolving time prediction.
+San Francisco 311-request resolving-time prediction.
 
 ### Aim of the project:
 
@@ -9,14 +9,14 @@ Development of a predictive model to determine the time of resolving a 311-call 
 ### Data source:  
   Data is obtained from San Francisco public dataset.  
   Exemplary features include  
-  Responsible Agency: 409
-   Category: 28 
+  Responsible Agency: 409  
+  Category: 28   
   Neighborhood: 126
 
   Data is heterogenous.  
-  Overall mean time of resolving requests is 33.3 days with standard deviation of 128 days.  
-  Minimum time of resolving a request is less than 10 minutes (e.g., Noise Complain).  
-  Maximum time of resolving a request is over 5 years (e.g., Fix a collapsed_sidewalk)
+  Overall mean resolving-time is 33.3 days with standard deviation of 128 days.  
+  Minimum resolving-time is less than 10 minutes (e.g., Noise Complain).  
+  Maximum resolving-time is over 5 years (e.g., Fix a collapsed_sidewalk)
 
 ### Data analysis pipeline:  
   1. Data cleaning  
@@ -30,10 +30,10 @@ Development of a predictive model to determine the time of resolving a 311-call 
      2.2 Generation of time related features, including 'Year', 'Month', 'Weekend', 'Holiday'
 
   3. Model development  
-     3.1 Development of linear regression model as the baseline model  
-     3.2 Development of Aalen's additive survival models  
-     3.3 Development of random forest regression model  
-     3.4 Development of gradient boosting regression model  
+     3.1 Linear regression model as the baseline model  
+     3.2 Aalen's additive survival models  
+     3.3 Random forest regression model  
+     3.4 Gradient boosting regression model  
 
 ### Model evaluation:
 
@@ -43,18 +43,13 @@ Development of a predictive model to determine the time of resolving a 311-call 
 | Aalen's additive model             |      0.10     |
 | Random forest regression model     |      0.55     |
 | Gradient boosting regression model |      0.51     |
-                                         R2
-linear regression model                 0.11
-Aalen's additive model                  0.10
-random forest regression model          0.55
-gradient boosting regression model      0.51
 
-Feature importance:  
-'Request topic', 'Response Agency', 'Neighborhood', 'Year'
+Exemples of important features:  
+'Request topic', 'Response Agency', 'Neighborhood', 'Year'...
 
-Analysis of 'Year' feature leads to the discover of a interesting pattern that the mean resolving time of 311 requests started to decrease after 2010, coinciding with the starting time of data driven techniques' incorporation into San Francisco 311 program management.
+Analysis of 'Year' feature leads to the discover of a interesting pattern that the mean resolving-time of 311-requests started to decrease after 2010, coinciding with the incorporation of data-driven techniques into San Francisco 311 program.
 
 ### Summary  
-Random forest model performs well when modeling heterogenous data.
+Random forest model performs well when modeling heterogenous data compared to other linear models.
 
-Data driven techniques may contribute to the increase of work efficiency of San Francisco 311 program.
+Data driven techniques contribute to the increase of work efficiency of San Francisco 311 program.
