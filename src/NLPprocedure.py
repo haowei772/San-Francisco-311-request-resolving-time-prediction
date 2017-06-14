@@ -1,4 +1,4 @@
-'''Deal with request type using tf-idf then clustering'''
+'''Deal with 'Request type' by convert the text script into tf-idf then do k-means clustering on the tf-idf to generate categories of requests'''
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem.porter import PorterStemmer
@@ -17,10 +17,7 @@ filename_train_pickle = '../data/SF311_train.pickle'
 filename_train = '../data/SF311_train.csv'
 df = get_df_for_engineer(filename_train_pickle, filename_train)
 print 'dataframe shape: ', df.shape
-# print df.head()
 
-#df['Request Type'] = df['Request Type'].apply(lambda x: str(x).lower())
-#df1 = df[:1000]#run a pilot
 df1 = df.copy()
 df_tra, df_val = train_test_df_split(df1, test_size = 0.2, random_seed = 222)
 series_tra = df_tra['Request Topic'].apply(lambda x: str(x).lower())

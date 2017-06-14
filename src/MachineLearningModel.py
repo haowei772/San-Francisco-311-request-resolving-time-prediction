@@ -36,7 +36,7 @@ def RandomForestRegressor_model(X_train, X_test, y_train, y_test, estimators = 5
     yhat = rfr.predict(X_test)
     return rfr, yhat, score, oob_score
 
-'''GradientBoostingRegressor'''
+
 def GradientBoostingRegressor_model(X_train, X_test, y_train, y_test, estimators = 200, learning_r = 0.1):
     '''
     Build a Gradient Boosting regressor model
